@@ -3,7 +3,7 @@
 ## What does this app include out of the box?
 
 - templ setup with a simple page with a few example components
-- tailwindCSS setup with auto build from air
+- auto build from air
 - alpinejs setup
 - go server setup
 - docker setup

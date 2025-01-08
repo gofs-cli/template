@@ -1,7 +1,3 @@
 {
-  "recommendations": [
-    "esbenp.prettier-vscode",
-    "bradlc.vscode-tailwindcss",
-    "a-h.templ"
-  ]
+  "recommendations": ["esbenp.prettier-vscode", "a-h.templ"]
 }
