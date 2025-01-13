@@ -6,6 +6,7 @@ import (
 	"github.com/gofs-cli/template/internal/server/assets"
 	"github.com/gofs-cli/template/internal/server/handlers"
 	"github.com/gofs-cli/template/internal/ui/pages/home"
+	"github.com/gofs-cli/template/internal/ui/pages/notfound"
 	"github.com/gofs-cli/template/internal/ui/pages/page1"
 	"github.com/gofs-cli/template/internal/ui/pages/page2"
 	"github.com/gofs-cli/template/internal/ui/pages/validation"
@@ -20,12 +21,13 @@ func (s *Server) Routes() {
 	// handlers for normal routes with all general middleware
 	routesMux := http.NewServeMux()
 	routesMux.Handle("GET /{$}", home.Index())
+	routesMux.Handle("GET /", notfound.Index())
 	routesMux.Handle("GET /modal", home.Modal())
 
 	routesMux.Handle("GET /page1", page1.Index())
 	routesMux.Handle("GET /page2", page2.Index())
 
-	routesMux.Handle("/validate", validation.HandleNameValidation())
+	routesMux.Handle("POST /api/validate", validation.HandleNameValidation())
 
 	routesMux.Handle("GET /toast-success", home.Success())
 	routesMux.Handle("GET /toast-info", home.Info())

@@ -59,7 +59,7 @@ func Header() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "\"><h1><a href=\"/\">Header</a></h1><nav><a href=\"/page1\">Page 1</a> <a href=\"/page2\">Page 2</a> <a href=\"/page3\">Page 3</a></nav></header>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "\"><h1><a href=\"/\">Header</a></h1><nav><a href=\"/page1\">Page 1</a> <a href=\"/page2\">Page 2</a></nav></header>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
