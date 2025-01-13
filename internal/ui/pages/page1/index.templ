@@ -1,0 +1,23 @@
+package page1
+
+import "github.com/gofs-cli/template/internal/ui/components/toast"
+
+css classLayout() {
+	display: grid;
+}
+
+templ layout(header, body templ.Component) {
+	@toast.Container()
+	<main class={ classLayout() }>
+		<div>
+			@header
+		</div>
+		<div>
+			@body
+		</div>
+	</main>
+}
+
+templ body() {
+	<h1>Page 1</h1>
+}

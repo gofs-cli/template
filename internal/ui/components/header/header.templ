@@ -1,0 +1,18 @@
+package header
+
+css classHeader() {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+}
+
+templ Header() {
+	<header hx-boost="true" class={ classHeader() }>
+		<h1><a href="/">Header</a></h1>
+		<nav>
+			<a href="/page1">Page 1</a>
+			<a href="/page2">Page 2</a>
+			<a href="/page3">Page 3</a>
+		</nav>
+	</header>
+}

@@ -1,0 +1,77 @@
+package home
+
+import (
+	"github.com/gofs-cli/template/internal/ui/components/modal"
+	"github.com/gofs-cli/template/internal/ui/components/toast"
+	"github.com/gofs-cli/template/internal/ui/pages/validation"
+)
+
+css classLayout() {
+	display: grid;
+}
+
+templ layout(header, body templ.Component) {
+	@toast.Container()
+	<main class={ classLayout() }>
+		<div>
+			@header
+		</div>
+		<div>
+			@body
+		</div>
+	</main>
+}
+
+templ body() {
+	<h1>Home</h1>
+	<label>
+		<h2>Demo: Modal</h2>
+		<button
+			hx-get="/modal"
+			hx-target="main"
+			hx-swap="afterbegin"
+		>Open Modal</button>
+	</label>
+	<div>
+		<h2>Demo: Toast</h2>
+		<div>
+			<button
+				hx-get="/toast-success"
+				hx-swap="none"
+			>
+				Success Toast
+			</button>
+			<button
+				hx-get="/toast-info"
+				hx-swap="none"
+			>
+				Info Toast
+			</button>
+			<button
+				hx-get="/toast-warning"
+				hx-swap="none"
+			>
+				Warning Toast
+			</button>
+			<button
+				hx-get="/toast-error"
+				hx-swap="none"
+			>
+				Error Toast
+			</button>
+		</div>
+	</div>
+	@validation.TextInput()
+}
+
+templ ModalDemo() {
+	@modal.Modal() {
+		<div>
+			<h2>Demo Modal</h2>
+			<p>Modal content</p>
+			<button @click="close">
+				Close
+			</button>
+		</div>
+	}
+}
