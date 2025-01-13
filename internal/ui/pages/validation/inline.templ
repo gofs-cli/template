@@ -5,7 +5,7 @@ templ TextInput() {
 		<input
 			name="name"
 			hx-trigger="input changed delay:500ms"
-			hx-post="/validate"
+			hx-post="/api/validate"
 			hx-target="#errMsg"
 			hx-swap="innerHTML"
 		/>
