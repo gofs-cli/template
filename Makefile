@@ -9,6 +9,14 @@ run: dbup
 	@air
 .PHONY: run
 
+lint:
+	@golangci-lint run
+.PHONY: lint
+
+build:
+	@go build cmd/server/main.go
+.PHONY: build
+
 test: 
 	@go test -v ./...
 .PHONY: test

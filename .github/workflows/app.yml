@@ -1,0 +1,63 @@
+name: App CI
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    # paths:
+    #   - .github/workflows/app.yaml
+    #   - .github/workflows/build.yaml
+    #   - .github/workflows/lint.yaml
+    #   - .github/workflows/test.yaml
+    #   - "**"
+    tags:
+      - app/v[0-9]+\.[0-9]+\.[0-9]+
+      - app/v[0-9]+\.[0-9]+\.[0-9]+-staging
+
+  pull_request:
+    branches:
+      - main
+    # paths:
+    #   - .github/workflows/app.yaml
+    #   - .github/workflows/build.yaml
+    #   - .github/workflows/lint.yaml
+    #   - .github/workflows/test.yaml
+    #   - "**"
+
+jobs:
+  checkout:
+    name: Checkout
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        name: Checkout project
+      - uses: actions/setup-go@v5
+        name: Install Golang
+        with:
+          go-version-file: "go.mod"
+      - run: make templ
+        name: Install Templ
+      - run: templ generate
+        name: Generate templ files
+      - uses: actions/upload-artifact@v4
+        name: Upload artifact
+        with:
+          include-hidden-files: true
+          name: checkout-${{ github.run_id }}
+          path: ${{ github.workspace }}/
+
+  build:
+    needs: checkout
+    name: Build
+    uses: "./.github/workflows/build.yml"
+
+  lint:
+    needs: checkout
+    name: Lint
+    uses: "./.github/workflows/lint.yml"
+
+  test:
+    needs: checkout
+    name: Test
+    uses: ./.github/workflows/test.yml
