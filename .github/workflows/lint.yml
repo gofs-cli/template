@@ -19,4 +19,4 @@ jobs:
         name: Run golangci-lint
         with:
           args: --config=.golangci.yml
-          version: v1.63.4
+          version: latest
