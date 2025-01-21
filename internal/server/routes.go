@@ -5,6 +5,7 @@ import (
 
 	"github.com/gofs-cli/template/internal/server/assets"
 	"github.com/gofs-cli/template/internal/server/handlers"
+	clicktoedit "github.com/gofs-cli/template/internal/ui/pages/click-to-edit"
 	"github.com/gofs-cli/template/internal/ui/pages/home"
 	"github.com/gofs-cli/template/internal/ui/pages/notfound"
 	"github.com/gofs-cli/template/internal/ui/pages/page1"
@@ -22,6 +23,13 @@ func (s *Server) Routes() {
 	routesMux := http.NewServeMux()
 	routesMux.Handle("GET /{$}", home.Index())
 	routesMux.Handle("GET /", notfound.Index())
+
+	// click to edit example
+	routesMux.Handle("GET /click-to-edit", clicktoedit.Index())
+	routesMux.Handle("GET /contact/1/edit", clicktoedit.EditForm())
+	routesMux.Handle("GET /contact/1", clicktoedit.Form())
+	routesMux.Handle("PUT /contact/1", clicktoedit.SaveForm())
+
 	routesMux.Handle("GET /modal", home.Modal())
 
 	routesMux.Handle("GET /page1", page1.Index())
