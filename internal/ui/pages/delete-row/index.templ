@@ -1,0 +1,114 @@
+package deleterow
+
+import (
+	"fmt"
+	"github.com/gofs-cli/template/internal/ui/components/toast"
+)
+
+css classLayout() {
+	display: grid;
+}
+
+templ layout(header, body templ.Component) {
+	@toast.Container()
+	<main class={ classLayout() }>
+		<div>
+			@header
+		</div>
+		<div>
+			@body
+		</div>
+	</main>
+}
+
+templ body() {
+	<h2>Click to Load</h2>
+	@table()
+}
+
+templ table() {
+	<table class="table delete-row-example">
+		<thead>
+			<tr>
+				<th>Name</th>
+				<th>Email</th>
+				<th>Status</th>
+				<th></th>
+			</tr>
+		</thead>
+		<tbody hx-confirm="Are you sure?" hx-target="closest tr" hx-swap="outerHTML swap:1s">
+			<tr>
+				<td>Joe Smith</td>
+				<td>joe@smith.org</td>
+				<td>Active</td>
+				<td>
+					<button class="btn danger" hx-delete="/delete-row/contact/1">
+						Delete
+					</button>
+				</td>
+			</tr>
+			<tr>
+				<td>Angie MacDowell</td>
+				<td>angie@macdowell.org</td>
+				<td>Active</td>
+				<td>
+					<button class="btn danger" hx-delete="/delete-row/contact/1">
+						Delete
+					</button>
+				</td>
+			</tr>
+			<tr>
+				<td>Fuqua Tarkenton</td>
+				<td>fuqua@tarkenton.org</td>
+				<td>Active</td>
+				<td>
+					<button class="btn danger" hx-delete="/delete-row/contact/1">
+						Delete
+					</button>
+				</td>
+			</tr>
+			<tr>
+				<td>Kim Yee</td>
+				<td>kim@yee.org</td>
+				<td>Active</td>
+				<td>
+					<button class="btn danger" hx-delete="/delete-row/contact/1">
+						Delete
+					</button>
+				</td>
+			</tr>
+		</tbody>
+	</table>
+}
+
+templ row(i int) {
+	<tr>
+		<td>Agent Smith</td>
+		<td>
+			{ fmt.Sprintf("void%d@null.org", i) }
+		</td>
+		<td>555-555-5555</td>
+	</tr>
+}
+
+templ loadmore(page int) {
+	<tr id="replaceMe">
+		<td colspan="3">
+			<button
+				class="btn primary"
+				hx-get={ fmt.Sprintf("/click-to-load/contacts?page=%d", page) }
+				hx-target="#replaceMe"
+				hx-swap="outerHTML"
+			>
+				Load More Agents... <img class="htmx-indicator" src="/img/bars.svg"/>
+			</button>
+		</td>
+	</tr>
+}
+
+templ page(page int) {
+	for i := page*10; i < (page+1)*10; i++ {
+		@row(i)
+	}
+	@loadmore(page + 1)
+}
