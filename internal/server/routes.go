@@ -7,7 +7,7 @@ import (
 	"github.com/gofs-cli/template/internal/server/handlers"
 	bulkupdate "github.com/gofs-cli/template/internal/ui/pages/bulk-update"
 	clicktoedit "github.com/gofs-cli/template/internal/ui/pages/click-to-edit"
-	clicktoload "github.com/gofs-cli/template/internal/ui/pages/clik-to-load"
+	clicktoload "github.com/gofs-cli/template/internal/ui/pages/click-to-load"
 	"github.com/gofs-cli/template/internal/ui/pages/home"
 	"github.com/gofs-cli/template/internal/ui/pages/notfound"
 	"github.com/gofs-cli/template/internal/ui/pages/page1"
