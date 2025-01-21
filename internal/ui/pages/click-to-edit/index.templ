@@ -28,14 +28,14 @@ templ form(firstName, lastName, email string) {
 		<div><label>First Name</label>: { firstName }</div>
 		<div><label>Last Name</label>: { lastName }</div>
 		<div><label>Email</label>: { email }</div>
-		<button hx-get="/contact/1/edit" class="btn primary">
+		<button hx-get="/click-to-edit/contact/1/edit" class="btn primary">
 			Click To Edit
 		</button>
 	</div>
 }
 
 templ editForm() {
-	<form hx-put="/contact/1" hx-target="this" hx-swap="outerHTML">
+	<form hx-put="/click-to-edit/contact/1" hx-target="this" hx-swap="outerHTML">
 		<div>
 			<label>First Name</label>
 			<input type="text" name="firstName" value="Joe"/>
@@ -49,6 +49,6 @@ templ editForm() {
 			<input type="email" name="email" value="joe@blow.com"/>
 		</div>
 		<button class="btn">Submit</button>
-		<button class="btn" hx-get="/contact/1">Cancel</button>
+		<button class="btn" hx-get="/click-to-edit/contact/1">Cancel</button>
 	</form>
 }

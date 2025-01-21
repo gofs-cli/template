@@ -33,7 +33,7 @@ var initialState = map[string]bool{
 templ form() {
 	<form
 		id="checked-contacts"
-		hx-post="/users"
+		hx-post="/bulk-update/users"
 		hx-swap="innerHTML settle:3s"
 		hx-target="#toast"
 	>

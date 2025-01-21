@@ -7,6 +7,7 @@ import (
 	"github.com/gofs-cli/template/internal/server/handlers"
 	bulkupdate "github.com/gofs-cli/template/internal/ui/pages/bulk-update"
 	clicktoedit "github.com/gofs-cli/template/internal/ui/pages/click-to-edit"
+	clicktoload "github.com/gofs-cli/template/internal/ui/pages/clik-to-load"
 	"github.com/gofs-cli/template/internal/ui/pages/home"
 	"github.com/gofs-cli/template/internal/ui/pages/notfound"
 	"github.com/gofs-cli/template/internal/ui/pages/page1"
@@ -27,13 +28,17 @@ func (s *Server) Routes() {
 
 	// click to edit example
 	routesMux.Handle("GET /click-to-edit", clicktoedit.Index())
-	routesMux.Handle("GET /contact/1/edit", clicktoedit.EditForm())
-	routesMux.Handle("GET /contact/1", clicktoedit.Form())
-	routesMux.Handle("PUT /contact/1", clicktoedit.SaveForm())
+	routesMux.Handle("GET /click-to-edit/contact/1/edit", clicktoedit.EditForm())
+	routesMux.Handle("GET /click-to-edit/contact/1", clicktoedit.Form())
+	routesMux.Handle("PUT /click-to-edit/contact/1", clicktoedit.SaveForm())
 
 	// bulk update example
 	routesMux.Handle("GET /bulk-update", bulkupdate.Index())
-	routesMux.Handle("POST /users", bulkupdate.Update())
+	routesMux.Handle("POST /bulk-update/users", bulkupdate.Update())
+
+	// click to load example
+	routesMux.Handle("GET /click-to-load", clicktoload.Index())
+	routesMux.Handle("GET /click-to-load/contacts", clicktoload.Page())
 
 	routesMux.Handle("GET /modal", home.Modal())
 
