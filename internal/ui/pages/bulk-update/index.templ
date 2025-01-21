@@ -1,0 +1,74 @@
+package bulkupdate
+
+import "github.com/gofs-cli/template/internal/ui/components/toast"
+
+css classLayout() {
+	display: grid;
+}
+
+templ layout(header, body templ.Component) {
+	@toast.Container()
+	<main class={ classLayout() }>
+		<div>
+			@header
+		</div>
+		<div>
+			@body
+		</div>
+	</main>
+}
+
+templ body() {
+	<h2>Bulk Update</h2>
+	@form()
+}
+
+var initialState = map[string]bool{
+	"joe@smith.org":       false,
+	"angie@macdowell.org": false,
+	"fuqua@tarkenton.org": false,
+	"kim@yee.org":         false,
+}
+
+templ form() {
+	<form
+		id="checked-contacts"
+		hx-post="/users"
+		hx-swap="innerHTML settle:3s"
+		hx-target="#toast"
+	>
+		<table>
+			<thead>
+				<tr>
+					<th>Name</th>
+					<th>Email</th>
+					<th>Active</th>
+				</tr>
+			</thead>
+			<tbody id="tbody">
+				<tr>
+					<td>Joe Smith</td>
+					<td>joe@smith.org</td>
+					<td><input type="checkbox" checked?={ initialState["joe@smith.org"] } name="active:joe@smith.org"/></td>
+				</tr>
+				<tr>
+					<td>Angie MacDowell</td>
+					<td>angie@macdowell.org</td>
+					<td><input type="checkbox" checked?={ initialState["angie@macdowell.org"] } name="active:angie@macdowell.org"/></td>
+				</tr>
+				<tr>
+					<td>Fuqua Tarkenton</td>
+					<td>fuqua@tarkenton.org</td>
+					<td><input type="checkbox" checked?={ initialState["fuqua@tarkenton.org"] } name="active:fuqua@tarkenton.org"/></td>
+				</tr>
+				<tr>
+					<td>Kim Yee</td>
+					<td>kim@yee.org</td>
+					<td><input type="checkbox" checked?={ initialState["kim@yee.org"] } name="active:kim@yee.org"/></td>
+				</tr>
+			</tbody>
+		</table>
+		<input type="submit" value="Bulk Update" class="btn primary"/>
+		<span id="toast"></span>
+	</form>
+}

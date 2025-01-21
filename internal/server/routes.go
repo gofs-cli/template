@@ -5,6 +5,7 @@ import (
 
 	"github.com/gofs-cli/template/internal/server/assets"
 	"github.com/gofs-cli/template/internal/server/handlers"
+	bulkupdate "github.com/gofs-cli/template/internal/ui/pages/bulk-update"
 	clicktoedit "github.com/gofs-cli/template/internal/ui/pages/click-to-edit"
 	"github.com/gofs-cli/template/internal/ui/pages/home"
 	"github.com/gofs-cli/template/internal/ui/pages/notfound"
@@ -29,6 +30,10 @@ func (s *Server) Routes() {
 	routesMux.Handle("GET /contact/1/edit", clicktoedit.EditForm())
 	routesMux.Handle("GET /contact/1", clicktoedit.Form())
 	routesMux.Handle("PUT /contact/1", clicktoedit.SaveForm())
+
+	// bulk update example
+	routesMux.Handle("GET /bulk-update", bulkupdate.Index())
+	routesMux.Handle("POST /users", bulkupdate.Update())
 
 	routesMux.Handle("GET /modal", home.Modal())
 
