@@ -9,6 +9,7 @@ import (
 	clicktoedit "github.com/gofs-cli/template/internal/ui/pages/click-to-edit"
 	clicktoload "github.com/gofs-cli/template/internal/ui/pages/click-to-load"
 	"github.com/gofs-cli/template/internal/ui/pages/home"
+	inlinevalidation "github.com/gofs-cli/template/internal/ui/pages/inline-validation"
 	"github.com/gofs-cli/template/internal/ui/pages/notfound"
 	"github.com/gofs-cli/template/internal/ui/pages/page1"
 	"github.com/gofs-cli/template/internal/ui/pages/page2"
@@ -39,6 +40,10 @@ func (s *Server) Routes() {
 	// click to load example
 	routesMux.Handle("GET /click-to-load", clicktoload.Index())
 	routesMux.Handle("GET /click-to-load/contacts", clicktoload.Page())
+
+	// inline validation example
+	routesMux.Handle("GET /inline-validation", inlinevalidation.Index())
+	routesMux.Handle("POST /inline-validation/email", inlinevalidation.Validate())
 
 	routesMux.Handle("GET /modal", home.Modal())
 
