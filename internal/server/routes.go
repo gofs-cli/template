@@ -5,6 +5,7 @@ import (
 
 	"github.com/gofs-cli/template/internal/server/assets"
 	"github.com/gofs-cli/template/internal/server/handlers"
+	activesearch "github.com/gofs-cli/template/internal/ui/pages/active-search"
 	bulkupdate "github.com/gofs-cli/template/internal/ui/pages/bulk-update"
 	clicktoedit "github.com/gofs-cli/template/internal/ui/pages/click-to-edit"
 	clicktoload "github.com/gofs-cli/template/internal/ui/pages/click-to-load"
@@ -44,6 +45,10 @@ func (s *Server) Routes() {
 	// delete row example
 	routesMux.Handle("GET /delete-row", deleterow.Index())
 	routesMux.Handle("DELETE /delete-row/contact/1", deleterow.Delete())
+
+	// active search example
+	routesMux.Handle("GET /active-search", activesearch.Index())
+	routesMux.Handle("POST /active-search/search", activesearch.Search())
 
 	routesMux.Handle("GET /modal", home.Modal())
 
