@@ -1,0 +1,72 @@
+package inlinevalidation
+
+import "github.com/gofs-cli/template/internal/ui/components/toast"
+
+css classLayout() {
+	display: grid;
+}
+
+css validInput() {
+	box-shadow: 0 0 3px #36cc00;
+}
+
+css errorInput() {
+	box-shadow: 0 0 3px #CC0000;
+}
+
+css errorMessage() {
+	color: red;
+}
+
+templ layout(header, body templ.Component) {
+	@toast.Container()
+	<main class={ classLayout() }>
+		<div>
+			@header
+		</div>
+		<div>
+			@body
+		</div>
+	</main>
+}
+
+templ body() {
+	<h2>Inline Validation</h2>
+	@form()
+}
+
+templ form() {
+	<form hx-post="/inline-validation">
+		<div hx-target="this" hx-swap="outerHTML">
+			<label>Email Address</label>
+			<input name="email" hx-post="/inline-validation/email" hx-indicator="#ind"/>
+			<img id="ind" src="/img/bars.svg" class="htmx-indicator"/>
+		</div>
+		<div class="form-group">
+			<label>First Name</label>
+			<input type="text" class="form-control" name="firstName"/>
+		</div>
+		<div class="form-group">
+			<label>Last Name</label>
+			<input type="text" class="form-control" name="lastName"/>
+		</div>
+		<button class="btn primary">Submit</button>
+	</form>
+}
+
+templ errorEmail(email string) {
+	<div hx-target="this" hx-swap="outerHTML">
+		<label>Email Address</label>
+		<input name="email" hx-post="/inline-validation/email" hx-indicator="#ind" value={ email } class={ errorInput() }/>
+		<img id="ind" src="/img/bars.svg" class="htmx-indicator"/>
+		<div class={ errorMessage() }>That email is already taken.  Please enter another email.</div>
+	</div>
+}
+
+templ validEmail(email string) {
+	<div hx-target="this" hx-swap="outerHTML">
+		<label>Email Address</label>
+		<input name="email" hx-post="/inline-validation/email" hx-indicator="#ind" value={ email } class={ validInput() }/>
+		<img id="ind" src="/img/bars.svg" class="htmx-indicator"/>
+	</div>
+}
