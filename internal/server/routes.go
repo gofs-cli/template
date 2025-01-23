@@ -13,6 +13,7 @@ import (
 	"github.com/gofs-cli/template/internal/ui/pages/notfound"
 	"github.com/gofs-cli/template/internal/ui/pages/page1"
 	"github.com/gofs-cli/template/internal/ui/pages/page2"
+	progressbar "github.com/gofs-cli/template/internal/ui/pages/progress-bar"
 	"github.com/gofs-cli/template/internal/ui/pages/validation"
 )
 
@@ -44,6 +45,12 @@ func (s *Server) Routes() {
 	// delete row example
 	routesMux.Handle("GET /delete-row", deleterow.Index())
 	routesMux.Handle("DELETE /delete-row/contact/1", deleterow.Delete())
+
+	// progress bar example
+	routesMux.Handle("GET /progress-bar", progressbar.Index())
+	routesMux.Handle("POST /progress-bar/start", progressbar.StartProgressBar())
+	routesMux.Handle("GET /progress-bar/job/progress", progressbar.RunProgressBar())
+	routesMux.Handle("GET /progress-bar/job", progressbar.CompleteProgressBar())
 
 	routesMux.Handle("GET /modal", home.Modal())
 
