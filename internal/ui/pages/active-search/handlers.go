@@ -37,7 +37,7 @@ var rows = []Row{
 		Email:     "rick.astley@email.com",
 	},
 	{
-		FirstName: "thomas",
+		FirstName: "Thomas",
 		LastName:  "cook",
 		Email:     "thomas.cook@email.com",
 	},
@@ -46,6 +46,16 @@ var rows = []Row{
 func Search() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		searchQuery := strings.ToLower(r.PostFormValue("search"))
-		templ.Handler(searchResults(rows, searchQuery)).ServeHTTP(w, r)
+		filteredRows := []Row{}
+		for _, v := range rows {
+			if contains(v.FirstName, searchQuery) || contains(v.LastName, searchQuery) || contains(v.Email, searchQuery) {
+				filteredRows = append(filteredRows, v)
+			}
+		}
+		templ.Handler(searchResults(filteredRows)).ServeHTTP(w, r)
 	})
+}
+
+func contains(str, substr string) bool {
+	return strings.Contains(strings.ToLower(str), substr)
 }

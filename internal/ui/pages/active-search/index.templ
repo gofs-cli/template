@@ -1,7 +1,5 @@
 package activesearch
 
-import "strings"
-
 type Row struct {
 	FirstName string
 	LastName  string
@@ -52,18 +50,12 @@ templ body() {
 	</table>
 }
 
-templ searchResults(rows []Row, searchQuery string) {
+templ searchResults(rows []Row) {
 	for _, v := range rows {
-		if contains(v.FirstName, searchQuery) || contains(v.LastName, searchQuery) || contains(v.Email, searchQuery) {
-			<tr>
-				<td>{ v.FirstName }</td>
-				<td>{ v.LastName }</td>
-				<td>{ v.Email }</td>
-			</tr>
-		}
+		<tr>
+			<td>{ v.FirstName }</td>
+			<td>{ v.LastName }</td>
+			<td>{ v.Email }</td>
+		</tr>
 	}
-}
-
-func contains(str, substr string) bool {
-	return strings.Contains(strings.ToLower(str), substr)
 }
