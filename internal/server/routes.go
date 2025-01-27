@@ -48,6 +48,7 @@ func (s *Server) Routes() {
 
 	// inline validation example
 	routesMux.Handle("GET /inline-validation", inlinevalidation.Index())
+	routesMux.Handle("POST /inline-validation", inlinevalidation.Submit())
 	routesMux.Handle("POST /inline-validation/email", inlinevalidation.Validate())
 
 	routesMux.Handle("GET /modal", home.Modal())

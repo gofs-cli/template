@@ -14,13 +14,16 @@ func Index() http.Handler {
 	})
 }
 
+func Submit() http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		e := r.PostFormValue("email")
+		templ.Handler(form(e)).ServeHTTP(w, r)
+	})
+}
+
 func Validate() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		email := r.PostFormValue("email")
-		if email != "test@test.com" {
-			templ.Handler(errorEmail(email)).ServeHTTP(w, r)
-		} else {
-			templ.Handler(validEmail(email)).ServeHTTP(w, r)
-		}
+		e := r.PostFormValue("email")
+		templ.Handler(email(e, e != "test@test.com")).ServeHTTP(w, r)
 	})
 }

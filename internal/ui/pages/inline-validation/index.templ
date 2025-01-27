@@ -39,16 +39,12 @@ templ layout(header, body templ.Component) {
 templ body() {
 	<h2>Inline Validation:</h2>
 	<p>Enter an email into the input below and on tab out it will be validated. Only "test@test.com" will pass.</p>
-	@form()
+	@form("")
 }
 
-templ form() {
+templ form(emailAddress string) {
 	<form hx-post="/inline-validation" class={ formStyles() }>
-		<div hx-target="this" hx-swap="outerHTML">
-			<label>Email Address</label>
-			<input name="email" hx-post="/inline-validation/email" hx-indicator="#ind"/>
-			<img id="ind" src="/img/bars.svg" class="htmx-indicator"/>
-		</div>
+		@email(emailAddress, false)
 		<div>
 			<label>First Name</label>
 			<input type="text" name="firstName"/>
@@ -61,19 +57,25 @@ templ form() {
 	</form>
 }
 
-templ errorEmail(email string) {
+templ email(email string, err bool) {
 	<div hx-target="this" hx-swap="outerHTML">
 		<label>Email Address</label>
-		<input name="email" hx-post="/inline-validation/email" hx-indicator="#ind" value={ email } class={ errorInput() }/>
+		<input
+			name="email"
+			hx-post="/inline-validation/email"
+			hx-indicator="#ind"
+			value={ email }
+			if err {
+				class={ errorInput() }
+			}
+			else
+			if email !="" {
+				class={ validInput() }
+			}
+		/>
 		<img id="ind" src="/img/bars.svg" class="htmx-indicator"/>
-		<div class={ errorMessage() }>That email is already taken.  Please enter another email.</div>
-	</div>
-}
-
-templ validEmail(email string) {
-	<div hx-target="this" hx-swap="outerHTML">
-		<label>Email Address</label>
-		<input name="email" hx-post="/inline-validation/email" hx-indicator="#ind" value={ email } class={ validInput() }/>
-		<img id="ind" src="/img/bars.svg" class="htmx-indicator"/>
+		if err {
+			<div class={ errorMessage() }>That email is already taken.  Please enter another email.</div>
+		}
 	</div>
 }
