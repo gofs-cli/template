@@ -10,6 +10,7 @@ import (
 	clicktoload "github.com/gofs-cli/template/internal/ui/pages/click-to-load"
 	deleterow "github.com/gofs-cli/template/internal/ui/pages/delete-row"
 	"github.com/gofs-cli/template/internal/ui/pages/home"
+	inlinevalidation "github.com/gofs-cli/template/internal/ui/pages/inline-validation"
 	"github.com/gofs-cli/template/internal/ui/pages/notfound"
 	"github.com/gofs-cli/template/internal/ui/pages/page1"
 	"github.com/gofs-cli/template/internal/ui/pages/page2"
@@ -44,6 +45,11 @@ func (s *Server) Routes() {
 	// delete row example
 	routesMux.Handle("GET /delete-row", deleterow.Index())
 	routesMux.Handle("DELETE /delete-row/contact/1", deleterow.Delete())
+
+	// inline validation example
+	routesMux.Handle("GET /inline-validation", inlinevalidation.Index())
+	routesMux.Handle("POST /inline-validation", inlinevalidation.Submit())
+	routesMux.Handle("POST /inline-validation/email", inlinevalidation.Validate())
 
 	routesMux.Handle("GET /modal", home.Modal())
 
