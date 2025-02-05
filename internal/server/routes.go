@@ -7,6 +7,7 @@ import (
 	"github.com/gofs-cli/template/internal/server/handlers"
 	activesearch "github.com/gofs-cli/template/internal/ui/pages/active-search"
 	bulkupdate "github.com/gofs-cli/template/internal/ui/pages/bulk-update"
+	cascadingselect "github.com/gofs-cli/template/internal/ui/pages/cascading-select"
 	clicktoedit "github.com/gofs-cli/template/internal/ui/pages/click-to-edit"
 	clicktoload "github.com/gofs-cli/template/internal/ui/pages/click-to-load"
 	deleterow "github.com/gofs-cli/template/internal/ui/pages/delete-row"
@@ -55,6 +56,10 @@ func (s *Server) Routes() {
 	// active search example
 	routesMux.Handle("GET /active-search", activesearch.Index())
 	routesMux.Handle("POST /active-search/search", activesearch.Search())
+
+	// cascading select example
+	routesMux.Handle("GET /cascading-select", cascadingselect.Index())
+	routesMux.Handle("GET /cascading-select/models", cascadingselect.Models())
 
 	routesMux.Handle("GET /modal", home.Modal())
 
