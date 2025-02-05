@@ -1,0 +1,98 @@
+package progressbar
+
+import "fmt"
+
+css classLayout() {
+	display: grid;
+}
+
+css progress() {
+	height: 20px;
+	margin-bottom: 20px;
+	overflow: hidden;
+	background-color: #f5f5f5;
+	border-radius: 4px;
+	box-shadow: inset 0 1px 2px rgba(0,0,0,.1);
+}
+
+css progressbar() {
+	float: left;
+	width: 0%;
+	height: 100%;
+	font-size: 12px;
+	line-height: 20px;
+	color: #fff;
+	text-align: center;
+	background-color: #337ab7;
+	-webkit-box-shadow: inset 0 -1px 0 rgba(0,0,0,.15);
+	box-shadow: inset 0 -1px 0 rgba(0,0,0,.15);
+	-webkit-transition: width .6s ease;
+	-o-transition: width .6s ease;
+	transition: width .6s ease;
+}
+
+css loading(percent string) {
+	width: { fmt.Sprintf("%s%%", percent) };
+}
+
+templ layout(header, body templ.Component) {
+	<main class={ classLayout() }>
+		<div>
+			@header
+		</div>
+		<div>
+			@body
+		</div>
+	</main>
+}
+
+templ body() {
+	<h2>Progress Bar</h2>
+	<div hx-target="this" hx-swap="outerHTML">
+		<h3>Start Progress</h3>
+		<button class="btn primary" hx-post="/progress-bar/start">
+			Start Job
+		</button>
+	</div>
+}
+
+templ startProgressBar() {
+	<div hx-trigger="done" hx-get="/progress-bar/job" hx-swap="outerHTML" hx-target="this">
+		<h3 role="status" id="pblabel" tabindex="-1" autofocus>Running</h3>
+		<div
+			hx-get="/progress-bar/job/progress"
+			hx-trigger="every 600ms"
+			hx-target="this"
+			hx-swap="innerHTMl"
+		>
+			<div class={ progress() } role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-labelledby="pblabel">
+				<div id="pb" class={ progressbar(), loading("0") }></div>
+			</div>
+		</div>
+	</div>
+}
+
+templ inProgress(val string) {
+	<div class={ progress() } role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow={ val } aria-labelledby="pblabel">
+		<div id="pb" class={ progressbar(), loading(val) }></div>
+	</div>
+}
+
+templ completeProgressBar() {
+	<div hx-trigger="done" hx-get="/progress-bar/job" hx-swap="outerHTML" hx-target="this">
+		<h3 role="status" id="pblabel" tabindex="-1" autofocus>Complete</h3>
+		<div
+			hx-get="/progress-bar/job/progress"
+			hx-trigger="none"
+			hx-target="this"
+			hx-swap="innerHTML"
+		>
+			<div class={ progress() } role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="122" aria-labelledby="pblabel">
+				<div id="pb" class={ progressbar() } style="width:122%"></div>
+			</div>
+		</div>
+		<button id="restart-btn" class="btn primary" hx-post="/progress-bar/start" classes="add show:600ms">
+			Restart Job
+		</button>
+	</div>
+}
