@@ -1,0 +1,36 @@
+package animations
+
+import "fmt"
+
+css classLayout() {
+	display: grid;
+}
+
+css smooth() {
+	transition: all 1s ease-in;
+}
+
+templ layout(header, body templ.Component) {
+	<main class={ classLayout() }>
+		<div>
+			@header
+		</div>
+		<div>
+			@body
+		</div>
+	</main>
+}
+
+templ body() {
+	<h2>Animations:</h2>
+	<h3>Color throb:</h3>
+	<div id="color-demo" class={ smooth() } style="color: blue;" hx-get="/animations/colors" hx-swap="outerHTML" hx-trigger="every 2s">
+		Color Swap Demo
+	</div>
+}
+
+templ newColor(color string) {
+	<div id="color-demo" class={ smooth() } style={ fmt.Sprintf("color: %s;", color) } hx-get="/animations/colors" hx-swap="outerHTML" hx-trigger="every 2s">
+		Color Swap Demo
+	</div>
+}

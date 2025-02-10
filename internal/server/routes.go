@@ -6,6 +6,7 @@ import (
 	"github.com/gofs-cli/template/internal/server/assets"
 	"github.com/gofs-cli/template/internal/server/handlers"
 	activesearch "github.com/gofs-cli/template/internal/ui/pages/active-search"
+	"github.com/gofs-cli/template/internal/ui/pages/animations"
 	bulkupdate "github.com/gofs-cli/template/internal/ui/pages/bulk-update"
 	clicktoedit "github.com/gofs-cli/template/internal/ui/pages/click-to-edit"
 	clicktoload "github.com/gofs-cli/template/internal/ui/pages/click-to-load"
@@ -55,6 +56,10 @@ func (s *Server) Routes() {
 	// active search example
 	routesMux.Handle("GET /active-search", activesearch.Index())
 	routesMux.Handle("POST /active-search/search", activesearch.Search())
+
+	// animations example
+	routesMux.Handle("GET /animations", animations.Index())
+	routesMux.Handle("GET /animations/colors", animations.Colors())
 
 	routesMux.Handle("GET /modal", home.Modal())
 
