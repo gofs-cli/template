@@ -27,10 +27,31 @@ templ body() {
 	<div id="color-demo" class={ smooth() } style="color: blue;" hx-get="/animations/colors" hx-swap="outerHTML" hx-trigger="every 2s">
 		Color Swap Demo
 	</div>
+	@fadeIn()
 }
 
 templ newColor(color string) {
 	<div id="color-demo" class={ smooth() } style={ fmt.Sprintf("color: %s;", color) } hx-get="/animations/colors" hx-swap="outerHTML" hx-trigger="every 2s">
 		Color Swap Demo
 	</div>
+}
+
+templ fadeIn() {
+	<style>
+#fade-me-in.htmx-added {
+  opacity: 0;
+}
+#fade-me-in {
+  opacity: 1;
+  transition: opacity 1s ease-out;
+}
+</style>
+	<button
+		id="fade-me-in"
+		style="margin-top: 8px; padding: 4px;"
+		hx-post="/animations/fade_in_demo"
+		hx-swap="outerHTML settle:1s"
+	>
+		Fade Me In
+	</button>
 }

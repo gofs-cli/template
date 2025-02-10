@@ -60,6 +60,7 @@ func (s *Server) Routes() {
 	// animations example
 	routesMux.Handle("GET /animations", animations.Index())
 	routesMux.Handle("GET /animations/colors", animations.Colors())
+	routesMux.Handle("POST /animations/fade_in_demo", animations.FadeIn())
 
 	routesMux.Handle("GET /modal", home.Modal())
 

@@ -24,11 +24,14 @@ func Colors() http.Handler {
 			"orange",
 			"pink",
 		}
-
-		// Fix: Ensure we use all colors
 		color := colors[rand.IntN(len(colors))]
 
-		// Fix: Pass color correctly to the templ component
 		templ.Handler(newColor(color)).ServeHTTP(w, r)
+	})
+}
+
+func FadeIn() http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		templ.Handler(fadeIn()).ServeHTTP(w, r)
 	})
 }
