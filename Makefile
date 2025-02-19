@@ -2,11 +2,8 @@ $(shell cp -n .env.example .env)
 include .env
 export
 
-all: templ run
-.PHONY: all
-
 run: dbup
-	@air
+	@go tool wgo -file=.go -file=.templ -file=.css -file=.ts -xfile=_templ.go ./scripts/build.sh :: ./tmp/main
 .PHONY: run
 
 lint:
@@ -25,14 +22,6 @@ dbup:
 	@if [ -n "$$DSN" ]; then \
 		docker compose -f docker/docker-compose.yml up -d postgres; \
     fi
-
-	@if [ -n "$$TRACING" ]; then \
-		docker compose -f docker/docker-compose.yml up -d zipkin; \
-    fi
-
-	@if [ -n "$$METRICS" ]; then \
-		docker compose -f docker/docker-compose.yml up -d prometheus; \
-    fi
 .PHONY: dbup
 
 dbdown:
@@ -46,16 +35,6 @@ gendata: dbdown dbup
 codegen:
 	@go generate ./...
 .PHONY: gencode
-
-air: 
-	@echo "Installing air"
-	@go install github.com/air-verse/air@latest
-.PHONY: air
-
-templ:
-	@echo "Installing templ"
-	@rm -f $$(which templ) && go install github.com/a-h/templ/cmd/templ@$$(go list -m github.com/a-h/templ | cut -d' ' -f2)
-.PHONY: templ
 
 alpine:
 	@echo "Installing alpine.js"
@@ -75,6 +54,6 @@ htmx:
 		}
 .PHONY: htmx
 
-deps: air templ htmx alpine
+deps: htmx alpine
 	@go mod tidy
 .PHONY: deps
