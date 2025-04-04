@@ -36,18 +36,16 @@ func update{{.StructName}}(ctx context.Context, tx *sql.Tx, v *{{.StructName}}) 
 	_, err = tx.ExecContext(ctx, "UPDATE {{.StructName | Snake}}s SET last_updated = $1, blob = $2{{range .SearchableFields}}, {{.FieldName | Snake}} = ${{Add .FieldNumber 3}}{{end}} WHERE {{ $length := len .SearchableFields }}{{range .PkFields}}{{.FieldName | Snake}} = ${{Add $length 3}}{{end}}",
 		time.Now().UTC(), jsonb{{range .SearchableFields}}, v.{{.FieldName}}{{end}}{{range .PkFields}}, v.{{.FieldName}}{{end}})
 	return err
-}	
+}
 
-func delete{{.StructName}}(ctx context.Context, tx *sql.Tx, v *{{.StructName}}) error {
-	_, err := tx.ExecContext(ctx, "DELETE FROM {{.StructName | Snake}}s WHERE {{range .PkFields}}{{.FieldName | Snake}} = ${{Add .FieldNumber 1}}{{end}}",
-		{{range .PkFields}}v.{{.FieldName}}{{end}})
+func delete{{.StructName}}By{{range .PkFields}}{{.FieldName}}{{end}}(ctx context.Context, tx *sql.Tx{{range .PkFields}}, {{.FieldName}} {{.FieldType}}{{end}}) error {
+	_, err := tx.ExecContext(ctx, "DELETE FROM {{.StructName | Snake}}s WHERE {{range .PkFields}}{{.FieldName | Snake}} = ${{Add .FieldNumber 1}}{{end}}"{{range .PkFields}}, {{.FieldName}}{{end}})
 	return err
-}	
+}
 
-{{range .SearchableFields}}
+{{range .SearchableFields -}}
 func get{{.StructName}}sBy{{.FieldName}}(ctx context.Context, tx *sql.Tx, {{.FieldName}} {{.FieldType}}) ([]{{.StructName}}, error) {
-	rows, err := tx.QueryContext(ctx, "SELECT blob FROM {{.StructName | Snake}}s WHERE {{.FieldName | Snake}} = $1 LIMIT 5000",
-		{{.FieldName}})
+	rows, err := tx.QueryContext(ctx, "SELECT blob FROM {{.StructName | Snake}}s WHERE {{.FieldName | Snake}} = $1 LIMIT 5000", {{.FieldName}})
 	if err != nil {
 		return nil, err
 	}
@@ -67,4 +65,5 @@ func get{{.StructName}}sBy{{.FieldName}}(ctx context.Context, tx *sql.Tx, {{.Fie
 	}
 	return vs, nil
 }
+
 {{end}}
