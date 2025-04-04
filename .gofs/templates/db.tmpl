@@ -43,10 +43,9 @@ func delete{{.StructName}}By{{range .PkFields}}{{.FieldName}}{{end}}(ctx context
 	return err
 }
 
-{{range .SearchableFields}}
+{{range .SearchableFields -}}
 func get{{.StructName}}sBy{{.FieldName}}(ctx context.Context, tx *sql.Tx, {{.FieldName}} {{.FieldType}}) ([]{{.StructName}}, error) {
-	rows, err := tx.QueryContext(ctx, "SELECT blob FROM {{.StructName | Snake}}s WHERE {{.FieldName | Snake}} = $1 LIMIT 5000",
-		{{.FieldName}})
+	rows, err := tx.QueryContext(ctx, "SELECT blob FROM {{.StructName | Snake}}s WHERE {{.FieldName | Snake}} = $1 LIMIT 5000", {{.FieldName}})
 	if err != nil {
 		return nil, err
 	}
@@ -66,4 +65,5 @@ func get{{.StructName}}sBy{{.FieldName}}(ctx context.Context, tx *sql.Tx, {{.Fie
 	}
 	return vs, nil
 }
+
 {{end}}
