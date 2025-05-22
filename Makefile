@@ -14,7 +14,7 @@ build:
 	@go build cmd/server/main.go
 .PHONY: build
 
-test: 
+test:
 	@go test -v ./...
 .PHONY: test
 
@@ -43,7 +43,7 @@ alpine:
 		curl -s -O https://cdn.jsdelivr.net/npm/@alpinejs/collapse@3.x.x/dist/cdn.min.js ; mv cdn.min.js collapse.js ; \
 		curl -s -O https://cdn.jsdelivr.net/npm/@alpinejs/persist@3.x.x/dist/cdn.min.js ; mv cdn.min.js persist.js ; \
 		cd - ; \
-	} 
+	}
 .PHONY: alpine
 
 htmx:

@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"time"
 
 	"github.com/gofs-cli/template/internal/db/migrations"
 )
@@ -22,6 +23,27 @@ func (d *DB) Close(ctx context.Context) error {
 		return nil
 	}
 	return d.closeFn()
+}
+
+func (d *DB) Transaction(ctx context.Context, f func(tx *sql.Tx) error) error {
+	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
+	defer cancel()
+
+	tx, err := d.conn.BeginTx(ctx, nil)
+	if err != nil {
+		return err
+	}
+
+	err = f(tx)
+	if err != nil {
+		rollback_err := tx.Rollback()
+		if rollback_err != nil {
+			return fmt.Errorf("transaction error: %w, rollback err: %w", err, rollback_err)
+		}
+		return err
+	}
+
+	return tx.Commit()
 }
 
 func LocalPG(dsn string) (DB, error) {
