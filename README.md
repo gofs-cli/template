@@ -24,10 +24,10 @@ Development tools (sqlc, wgo, staticcheck, govulncheck) are pinned in the Makefi
 
 The template ships a small contacts app so that every pattern has a working example. Each is one page, one handler file and one or two components:
 
-| Page | Components | Shows |
-| --- | --- | --- |
-| `/contacts` | `live-search`, `load-more`, `edit-inline`, `row-delete` | search as you type, paging, edit a row in place, delete with a `<dialog>` confirmation |
-| `/contacts/new` | `validate-field` | server-side validation of one field while typing; a plain form post with a flash message |
+| Page            | Components                                              | Shows                                                                                    |
+| --------------- | ------------------------------------------------------- | ---------------------------------------------------------------------------------------- |
+| `/contacts`     | `live-search`, `load-more`, `edit-inline`, `row-delete` | search as you type, paging, edit a row in place, delete with a `<dialog>` confirmation   |
+| `/contacts/new` | `validate-field`                                        | server-side validation of one field while typing; a plain form post with a flash message |
 
 Every control is a working link or form before JavaScript loads. Handlers answer a plain form with a redirect and a component with a fragment; `ui.WantsFragment` tells the two apart.
 
@@ -35,7 +35,7 @@ Delete the `contact` package, the example pages and their components when you st
 
 ## Layout
 
-```
+```txt
 cmd/server              main
 internal
   app/contact           example backend package: domain rules, store, queries.sql

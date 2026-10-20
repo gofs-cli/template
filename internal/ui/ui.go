@@ -39,7 +39,7 @@ func Init() (*UI, error) {
 		if filepath.Ext(p) == ".js" {
 			return u.addComponent(p)
 		}
-		if filepath.Ext(p) != ".tmpl" {
+		if filepath.Ext(p) != ".gohtml" {
 			return nil
 		}
 		t, err := template.New(path.Base(p)).Funcs(funcs).ParseFS(FS, p)
