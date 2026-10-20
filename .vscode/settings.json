@@ -1,8 +1,7 @@
 {
   "files.insertFinalNewline": true,
   "files.exclude": {
-    "**/.git": true,
-    "**/.DS_Store": true
+    "**/.git": true
   },
   "editor.formatOnSave": true,
   "gopls": {
@@ -17,15 +16,8 @@
     "-count=1"
   ],
   "go.testEnvFile": "${workspaceFolder}/.env",
-  "js/ts.implicitProjectConfig.checkJs": true,
-  "[javascript]": {
-    "editor.defaultFormatter": "vscode.typescript-language-features"
-  },
-  "[css]": {
-    "editor.defaultFormatter": "vscode.css-language-features"
-  },
   "files.associations": {
-    "*.tmpl": "html"
+    "*.gohtml": "html"
   },
   "[html]": {
     "editor.defaultFormatter": "gohugoio.gotmplfmt"

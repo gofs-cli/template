@@ -1,7 +1,6 @@
 {
   "recommendations": [
     "golang.go",
-    "gofs-cli.gofs-vscode",
     "gohugoio.gotmplfmt"
   ]
 }

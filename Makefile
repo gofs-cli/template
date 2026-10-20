@@ -5,10 +5,10 @@ export
 # Development tools, pinned. They run with `go run pkg@version`, which keeps
 # go.mod free of tool dependencies. To use Go's tool directive instead, run
 # `go get -tool <pkg>@<version>` and replace `go run $(X)` with `go tool x`.
-SQLC        := github.com/sqlc-dev/sqlc/cmd/sqlc@v1.30.0
-WGO         := github.com/bokwoon95/wgo@v0.5.11
-STATICCHECK := honnef.co/go/tools/cmd/staticcheck@2025.1.1
-GOVULNCHECK := golang.org/x/vuln/cmd/govulncheck@v1.1.4
+SQLC        := github.com/sqlc-dev/sqlc/cmd/sqlc@latest
+WGO         := github.com/bokwoon95/wgo@latest
+STATICCHECK := honnef.co/go/tools/cmd/staticcheck@latest
+GOVULNCHECK := golang.org/x/vuln/cmd/govulncheck@latest
 
 run: dbup
 	@go run $(WGO) -file=.go -file=.tmpl -file=.css -file=.js -file=.sql go run ./cmd/server
