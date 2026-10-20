@@ -1,0 +1,24 @@
+{{ define "contacts/edit" }}
+<main>
+	<h1>Edit contact</h1>
+	<form method="post" action="/contacts/{{ .Contact.ID }}" class="card form-card">
+		<div class="field">
+			<label for="first_name">First name</label>
+			<input id="first_name" name="first_name" value="{{ .Contact.FirstName }}" required />
+		</div>
+		<div class="field">
+			<label for="last_name">Last name</label>
+			<input id="last_name" name="last_name" value="{{ .Contact.LastName }}" required />
+		</div>
+		<div class="field">
+			<label for="email">Email</label>
+			<input id="email" name="email" type="email" value="{{ .Contact.Email }}" required />
+		</div>
+		{{ with .Error }}<p class="error">{{ . }}</p>{{ end }}
+		<div class="actions">
+			<button class="primary">Save</button>
+			<a href="/contacts">Cancel</a>
+		</div>
+	</form>
+</main>
+{{ end }}

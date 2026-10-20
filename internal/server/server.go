@@ -7,16 +7,20 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/gofs-cli/template/internal/app/contact"
 	"github.com/gofs-cli/template/internal/config"
 	"github.com/gofs-cli/template/internal/db"
+	"github.com/gofs-cli/template/internal/ui"
 )
 
 type Server struct {
-	r       *http.ServeMux
-	srv     http.Server
-	conf    config.Config
-	db      db.DB
-	closeFn []func(context.Context) error
+	r        *http.ServeMux
+	srv      http.Server
+	conf     config.Config
+	db       db.DB
+	ui       *ui.UI
+	contacts *contact.Store // example data; see internal/app/contact
+	closeFn  []func(context.Context) error
 }
 
 func New(conf config.Config) (*Server, error) {
@@ -29,7 +33,11 @@ func New(conf config.Config) (*Server, error) {
 		Addr:         fmt.Sprintf("%s:%s", conf.Host, conf.Port),
 		Handler:      s.r,
 	}
-	var err error
+	ui, err := ui.Init()
+	if err != nil {
+		return nil, err
+	}
+	s.ui = ui
 	s.db, err = s.initDb()
 	if err != nil {
 		return nil, err
@@ -39,6 +47,8 @@ func New(conf config.Config) (*Server, error) {
 		return nil, fmt.Errorf("db: migrating tables: %w", err)
 	}
 	s.closeFn = append(s.closeFn, s.db.Close)
+
+	s.contacts = contact.NewStore(contact.SampleContacts())
 
 	return s, nil
 }

@@ -1,13 +1,8 @@
-FROM golang:latest AS build
+FROM golang:1.24 AS build
 
 WORKDIR /go/src/app
 COPY . .
-
-RUN go install github.com/a-h/templ/cmd/templ@latest
-RUN templ generate
-
-RUN go mod download
-RUN CGO_ENABLED=0 go build -o /go/bin/app cmd/server/main.go
+RUN CGO_ENABLED=0 go build -o /go/bin/app ./cmd/server
 
 FROM gcr.io/distroless/static-debian12:latest
 

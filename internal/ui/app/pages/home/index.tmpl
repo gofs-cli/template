@@ -1,0 +1,49 @@
+{{ define "home/index" }}
+<main>
+	<h1>gofs</h1>
+	<p>
+		A Go server rendering pages with <code>html/template</code>. Interactivity comes from small native web
+		components that ask the server for HTML fragments and swap them into the page. No framework, no bundler,
+		no runtime dependencies.
+	</p>
+
+	<section class="card">
+		<h2>Examples</h2>
+		<p class="muted">Each example is one page, one handler file and one or two components. Read them in this order.</p>
+		<ul>
+			<li><a href="/contacts">Contacts</a> — <code>&lt;live-search&gt;</code>, <code>&lt;load-more&gt;</code>, <code>&lt;edit-inline&gt;</code>, <code>&lt;row-delete&gt;</code></li>
+			<li><a href="/contacts/new">New contact</a> — <code>&lt;validate-field&gt;</code>, a plain form post, and <code>&lt;app-toast&gt;</code></li>
+		</ul>
+	</section>
+
+	<section class="card">
+		<h2>How it fits together</h2>
+		<ul>
+			<li><code>internal/server/routes.go</code> — every route in one place</li>
+			<li><code>internal/ui/app/pages/&lt;section&gt;/</code> — templates and their handlers, side by side</li>
+			<li><code>internal/ui/app/components/&lt;tag&gt;/element.js</code> — one folder per custom element</li>
+			<li><code>internal/ui/app/components/request.js</code> — the one helper components share</li>
+			<li><code>internal/app/contact</code> — the backend package: domain rules and the store</li>
+		</ul>
+	</section>
+
+	<p>
+		A modal needs no component. The browser's <code>&lt;dialog&gt;</code> handles opening, closing, focus, the
+		Escape key and the backdrop. The <code>command</code> and <code>commandfor</code> button attributes open and
+		close it with no JavaScript; <code>app.js</code> provides the same behaviour for older browsers.
+	</p>
+
+	<section class="card">
+		<button type="button" commandfor="example-dialog" command="show-modal">Open dialog</button>
+	</section>
+
+	<dialog id="example-dialog">
+		<h2>Hello</h2>
+		<p>This dialog is plain HTML. A form with <code>method="dialog"</code> closes it without a request.</p>
+		<form method="dialog" class="actions">
+			<button type="button" commandfor="example-dialog" command="close">Cancel</button>
+			<button class="primary" value="ok">OK</button>
+		</form>
+	</dialog>
+</main>
+{{ end }}

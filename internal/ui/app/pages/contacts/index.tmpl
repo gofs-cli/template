@@ -1,0 +1,17 @@
+{{ define "contacts/index" }}
+<main>
+	<h1>Contacts</h1>
+
+	{{ template "components/live-search" dict "Action" "/contacts" "Target" "contact-results" "Query" .Query "Placeholder" "Search by name or email" }}
+	<div id="contact-results">{{ template "contacts/results" . }}</div>
+
+	<dialog id="confirm-delete">
+		<h2>Delete contact?</h2>
+		<p>This cannot be undone.</p>
+		<form method="dialog" class="actions">
+			<button value="cancel">Cancel</button>
+			<button class="danger" value="confirm">Delete</button>
+		</form>
+	</dialog>
+</main>
+{{ end }}

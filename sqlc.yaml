@@ -1,0 +1,13 @@
+# sqlc configuration. One entry per backend package that has queries.
+# Run `make generate`. Generated code depends only on database/sql and is
+# committed; the app builds and runs without sqlc installed.
+version: "2"
+sql:
+  - engine: "postgresql"
+    schema: "internal/db/migrations"
+    queries: "internal/app/contact/queries.sql"
+    gen:
+      go:
+        package: "query"
+        out: "internal/app/contact/query"
+        sql_package: "database/sql"

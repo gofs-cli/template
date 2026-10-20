@@ -1,20 +1,21 @@
 package handlers
 
 import (
-	"embed"
+	"errors"
 	"fmt"
 	"hash/crc32"
 	"io"
+	"io/fs"
 	"net/http"
 	"sync"
 )
 
 type HashedAssets struct {
-	assets embed.FS
+	assets fs.FS
 	hashes sync.Map
 }
 
-func NewHashedAssets(assets embed.FS) *HashedAssets {
+func NewHashedAssets(assets fs.FS) *HashedAssets {
 	return &HashedAssets{assets: assets}
 }
 
@@ -38,6 +39,10 @@ func (h *HashedAssets) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if !ok {
 		var err error
 		etag, err = h.calculateHash(r.URL.Path)
+		if errors.Is(err, fs.ErrNotExist) {
+			http.NotFound(w, r) // return 404
+			return
+		}
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return

@@ -4,19 +4,17 @@ on: workflow_call
 
 jobs:
   lint:
-    name: golangci-lint
+    name: vet, staticcheck, govulncheck
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/download-artifact@v4
-        name: Get Cached Checkout
-        with:
-          name: checkout-${{ github.run_id }}
+      - uses: actions/checkout@v4
       - uses: actions/setup-go@v5
-        name: Install Golang
         with:
           go-version-file: "go.mod"
-      - uses: golangci/golangci-lint-action@v6
-        name: Run golangci-lint
-        with:
-          args: --config=.golangci.yml
-          version: latest
+      - run: test -z "$$(gofmt -l cmd internal)" || (gofmt -l cmd internal && exit 1)
+        name: gofmt
+      - run: make lint
+      - uses: gitleaks/gitleaks-action@v2
+        name: gitleaks
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

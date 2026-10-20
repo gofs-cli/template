@@ -2,26 +2,45 @@ $(shell cp -n .env.example .env)
 include .env
 export
 
+# Development tools, pinned. They run with `go run pkg@version`, which keeps
+# go.mod free of tool dependencies. To use Go's tool directive instead, run
+# `go get -tool <pkg>@<version>` and replace `go run $(X)` with `go tool x`.
+SQLC        := github.com/sqlc-dev/sqlc/cmd/sqlc@v1.30.0
+WGO         := github.com/bokwoon95/wgo@v0.5.11
+STATICCHECK := honnef.co/go/tools/cmd/staticcheck@2025.1.1
+GOVULNCHECK := golang.org/x/vuln/cmd/govulncheck@v1.1.4
+
 run: dbup
-	@go tool wgo -file=.go -file=.templ -file=.css -file=.ts -xfile=_templ.go ./scripts/build.sh :: ./tmp/main
+	@go run $(WGO) -file=.go -file=.tmpl -file=.css -file=.js -file=.sql go run ./cmd/server
 .PHONY: run
 
-lint:
-	@golangci-lint run
-.PHONY: lint
-
 build:
-	@go build cmd/server/main.go
+	@go build -o ./tmp/server ./cmd/server
 .PHONY: build
 
 test:
-	@go test -v ./...
+	@go test ./cmd/... ./internal/...
 .PHONY: test
+
+lint:
+	@go vet ./cmd/... ./internal/...
+	@go run $(STATICCHECK) ./cmd/... ./internal/...
+	@go run $(GOVULNCHECK) ./cmd/... ./internal/...
+.PHONY: lint
+
+fmt:
+	@gofmt -l -w cmd internal
+.PHONY: fmt
+
+# Runs sqlc for every package with a queries.sql (see sqlc.yaml).
+generate:
+	@go run $(SQLC) generate
+.PHONY: generate
 
 dbup:
 	@if [ -n "$$DSN" ]; then \
 		docker compose -f docker/docker-compose.yml up -d postgres; \
-    fi
+	fi
 .PHONY: dbup
 
 dbdown:
@@ -29,31 +48,5 @@ dbdown:
 .PHONY: dbdown
 
 gendata: dbdown dbup
-	@go test -v -tags=gendata -count=1 ./...
+	@go test -v -tags=gendata -count=1 ./internal/...
 .PHONY: gendata
-
-codegen:
-	@go generate ./...
-.PHONY: gencode
-
-alpine:
-	@echo "Installing alpine.js"
-	@cd internal/server/assets/js && { \
-		curl -s -O https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js ; mv cdn.min.js alpine.js ; \
-		curl -s -O https://cdn.jsdelivr.net/npm/@alpinejs/collapse@3.x.x/dist/cdn.min.js ; mv cdn.min.js collapse.js ; \
-		curl -s -O https://cdn.jsdelivr.net/npm/@alpinejs/persist@3.x.x/dist/cdn.min.js ; mv cdn.min.js persist.js ; \
-		cd - ; \
-	}
-.PHONY: alpine
-
-htmx:
-	@echo "Installing htmx"
-	@cd internal/server/assets/js && { \
-			curl -s -O https://unpkg.com/htmx.org@2.0.4/dist/htmx.min.js ; \
-			curl -s -O https://unpkg.com/htmx-ext-response-targets@2.0.0/response-targets.js ; cd - ; \
-		}
-.PHONY: htmx
-
-deps: htmx alpine
-	@go mod tidy
-.PHONY: deps
