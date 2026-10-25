@@ -21,7 +21,11 @@ func (s *Server) assetsMiddlewares(h http.Handler) http.Handler {
 		}),
 		middleware.Logger,
 		middleware.Compress(5),
-		middleware.SetHeader("Cache-Control", "max-age=604800, stale-while-revalidate=86400"),
+		// Asset URLs are not versioned, so revalidate instead of trusting a
+		// long max-age: after a deploy the browser would otherwise keep stale
+		// component JS (and its fragment URLs) for a week. The ETag makes a
+		// revalidation a 304.
+		middleware.SetHeader("Cache-Control", "no-cache"),
 	}
 	slices.Reverse(middlewares)
 	for _, m := range middlewares {

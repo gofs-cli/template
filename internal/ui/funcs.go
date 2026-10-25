@@ -11,12 +11,12 @@ var funcs = template.FuncMap{
 }
 
 // dict builds a map from key/value pairs so that a page can pass parameters
-// to a shared component template:
+// to a shared template, such as the document head:
 //
-//	{{ template "components/live-search" dict "Action" "/contacts" "Target" "contact-results" }}
+//	{{ template "layouts/head" dict "Title" "Contacts" }}
 //
-// Keys must be strings. Missing keys read as nil in the component, so use
-// {{ with .Key }} for optional parameters.
+// Keys must be strings. Missing keys read as nil, so use {{ with .Key }} for
+// optional parameters.
 func dict(pairs ...any) (map[string]any, error) {
 	if len(pairs)%2 != 0 {
 		return nil, fmt.Errorf("dict: odd number of arguments")

@@ -1,0 +1,189 @@
+{{/*
+components/contact-list: the contacts table, as declarative shadow DOM.
+
+The server renders the whole table into the shadow root; the browser attaches
+it without JavaScript. The module script below the host is the only client
+code: it hides the edit rows until Edit is pressed. Without it every row's
+form stays visible and posts normally.
+*/}}
+{{ define "components/contact-list" }}
+<contact-list>
+	<template shadowrootmode="open">
+		<style>
+			:host {
+				display: block;
+			}
+			table {
+				border-collapse: collapse;
+				width: 100%;
+			}
+			th,
+			td {
+				text-align: left;
+				padding: var(--space-2) var(--space-3);
+				border-block-end: 1px solid var(--color-border);
+			}
+			th {
+				color: var(--color-text-muted);
+				font-weight: 600;
+				font-size: 0.875rem;
+			}
+			a {
+				color: var(--color-primary);
+			}
+			.muted {
+				color: var(--color-text-muted);
+			}
+			.inactive {
+				color: var(--color-text-muted);
+				text-decoration: line-through;
+			}
+			.error {
+				color: var(--color-danger);
+				font-size: 0.875rem;
+			}
+			.actions {
+				display: flex;
+				gap: var(--space-2);
+				align-items: center;
+			}
+			.actions form {
+				margin: 0;
+			}
+			input,
+			button {
+				font: inherit;
+				color: inherit;
+			}
+			input {
+				padding: var(--space-2) var(--space-3);
+				border: 1px solid var(--color-border);
+				border-radius: var(--radius);
+				background: var(--color-surface-raised);
+				min-width: 0;
+			}
+			button {
+				padding: var(--space-2) var(--space-4);
+				border: 1px solid var(--color-border);
+				border-radius: var(--radius);
+				background: var(--color-surface-raised);
+				cursor: pointer;
+			}
+			button.primary {
+				background: var(--color-primary);
+				border-color: var(--color-primary);
+				color: var(--color-primary-contrast);
+			}
+			button.danger {
+				color: var(--color-danger);
+			}
+			.row-edit td {
+				background: var(--color-surface);
+			}
+			.row-edit form {
+				display: flex;
+				gap: var(--space-2);
+				flex-wrap: wrap;
+				align-items: center;
+			}
+			.row-edit input:not([type="hidden"]) {
+				flex: 1 1 8rem;
+			}
+			.row-edit .error {
+				flex-basis: 100%;
+			}
+			.visually-hidden {
+				position: absolute;
+				width: 1px;
+				height: 1px;
+				overflow: hidden;
+				clip-path: inset(50%);
+				white-space: nowrap;
+			}
+			.toolbar {
+				display: flex;
+				gap: var(--space-3);
+				align-items: center;
+				flex-wrap: wrap;
+			}
+		</style>
+
+		<form method="get" action="/contacts" class="toolbar" role="search">
+			<label for="q" class="visually-hidden">Search</label>
+			<input type="search" id="q" name="q" value="{{ .Query }}" placeholder="Search by name or email" autocomplete="off" />
+			<button>Search</button>
+		</form>
+
+		<p class="muted">{{ .Page.Total }} {{ if eq .Page.Total 1 }}contact{{ else }}contacts{{ end }}</p>
+		<table>
+			<thead>
+				<tr>
+					<th>Name</th>
+					<th>Email</th>
+					<th><span class="visually-hidden">Actions</span></th>
+				</tr>
+			</thead>
+			<tbody id="contact-rows">
+				{{ range .Rows }}{{ block "components/contact-row" . }}
+				<tr id="contact-{{ .Contact.ID }}" {{ if not .Contact.Active }}class="inactive"{{ end }}>
+					<td>{{ .Contact.Name }}</td>
+					<td>{{ .Contact.Email }}</td>
+					<td class="actions">
+						<button type="button" data-edit="contact-{{ .Contact.ID }}">Edit</button>
+						<form method="post" action="/contacts/{{ .Contact.ID }}/delete">
+							<button class="danger">Delete</button>
+						</form>
+					</td>
+				</tr>
+				{{/* The edit form is usable without JavaScript; the module script only hides
+				it until Edit is pressed. data-open keeps it visible after a validation error. */}}
+				<tr class="row-edit" id="contact-{{ .Contact.ID }}-edit" {{ if .Editing }}data-open{{ end }}>
+					<td colspan="3">
+						<form method="post" action="/contacts/{{ .Contact.ID }}" class="row-form">
+							<input type="hidden" name="q" value="{{ .Query }}" />
+							<input type="hidden" name="page" value="{{ .Page }}" />
+							<input name="first_name" value="{{ .Contact.FirstName }}" aria-label="First name" required />
+							<input name="last_name" value="{{ .Contact.LastName }}" aria-label="Last name" required />
+							<input name="email" type="email" value="{{ .Contact.Email }}" aria-label="Email" required />
+							<button class="primary">Save</button>
+							<button type="button" data-cancel="contact-{{ .Contact.ID }}">Cancel</button>
+							{{ with .Errors.first_name }}<p class="error">{{ . }}</p>{{ end }}
+							{{ with .Errors.last_name }}<p class="error">{{ . }}</p>{{ end }}
+							{{ with .Errors.email }}<p class="error">{{ . }}</p>{{ end }}
+						</form>
+					</td>
+				</tr>
+				{{ end }}{{ end }}
+			</tbody>
+		</table>
+		{{ with .MoreURL }}<a href="{{ . }}">Load more</a>{{ end }}
+	</template>
+</contact-list>
+
+{{/* The behavior sits next to the host, not inside the shadow template:
+scripts inside a declarative shadow root are inert. One file per component. */}}
+<script type="module">
+	class ContactList extends HTMLElement {
+		connectedCallback() {
+			const root = this.shadowRoot;
+			if (!root) return;
+
+			for (const row of root.querySelectorAll(".row-edit")) {
+				if (!row.hasAttribute("data-open")) row.hidden = true;
+			}
+
+			root.addEventListener("click", (e) => {
+				const button = e.target instanceof Element ? e.target.closest("[data-edit], [data-cancel]") : null;
+				if (!button) return;
+				const id = button.getAttribute("data-edit") ?? button.getAttribute("data-cancel");
+				if (!id) return;
+				const row = root.getElementById(`${id}-edit`);
+				if (!(row instanceof HTMLElement)) return;
+				row.hidden = button.hasAttribute("data-cancel");
+			});
+		}
+	}
+
+	if (!customElements.get("contact-list")) customElements.define("contact-list", ContactList);
+</script>
+{{ end }}

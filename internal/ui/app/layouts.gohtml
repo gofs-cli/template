@@ -1,17 +1,17 @@
-{{ define "layouts/main" -}}
+{{ define "layouts/head" -}}
 <!doctype html>
 <html lang="en">
 	<head>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
-		<title>Gofs</title>
+		<title>{{ or .Title "gofs" }}</title>
 		<link rel="stylesheet" href="/assets/css/app.css" />
-    <script type="importmap">{"imports": {"gofs/": "/assets/js/"}}</script>
-    <script type="module" src="/assets/js/app.js"></script>
 	</head>
 	<body>
-		{{ template "components/menu" . }}
-		{{ template "content" . }}
+	{{ template "components/site-header" . }}
+{{- end }}
+
+{{ define "layouts/foot" -}}
 	</body>
 </html>
 {{- end }}

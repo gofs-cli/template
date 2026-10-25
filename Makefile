@@ -11,7 +11,7 @@ STATICCHECK := honnef.co/go/tools/cmd/staticcheck@latest
 GOVULNCHECK := golang.org/x/vuln/cmd/govulncheck@latest
 
 run: dbup
-	@go run $(WGO) -file=.go -file=.tmpl -file=.css -file=.js -file=.sql go run ./cmd/server
+	@go run $(WGO) -file=.go -file=.gohtml -file=.css -file=.js -file=.sql go run ./cmd/server
 .PHONY: run
 
 build:

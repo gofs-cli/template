@@ -1,75 +1,53 @@
+// Package ui parses the templates embedded under app/ once, at startup, and
+// renders them by name.
 package ui
 
 import (
+	"bytes"
 	"embed"
-	"fmt"
 	"html/template"
 	"io/fs"
-	"path"
+	"net/http"
 	"path/filepath"
-	"sync"
 )
 
 //go:embed app
-var FS embed.FS
+var appFS embed.FS
 
-const appFolder = "app"
+// templates holds every {{ define }} block found under app/. A page includes
+// "layouts/head" and "layouts/foot" to form the document.
+var templates = mustParse()
 
-type UI struct {
-	root       *template.Template // every template (never executed so it can be cloned)
-	fragments  *template.Template // clone of root used to execute fragments
-	cache      sync.Map
-	components map[string]string   // custom element tag -> path of its element.js
-	templates  map[string]struct{} // unique template names
-}
-
-func Init() (*UI, error) {
-	root := template.New("root").Funcs(funcs)
-	if root == nil {
-		return nil, fmt.Errorf("could not create root template")
-	}
-	u := &UI{root: root, components: map[string]string{}, templates: map[string]struct{}{}}
-	err := fs.WalkDir(FS, appFolder, func(p string, d fs.DirEntry, err error) error {
+// mustParse reads every .gohtml file into one template set. Files are parsed
+// one by one under their path name, so same-named files do not collide; a
+// name defined twice keeps the last one seen, as html/template does.
+func mustParse() *template.Template {
+	t := template.New("root").Funcs(funcs)
+	err := fs.WalkDir(appFS, "app", func(p string, d fs.DirEntry, err error) error {
+		if err != nil || d.IsDir() || filepath.Ext(p) != ".gohtml" {
+			return err
+		}
+		body, err := appFS.ReadFile(p)
 		if err != nil {
 			return err
 		}
-		if d.IsDir() {
-			return nil
-		}
-		if filepath.Ext(p) == ".js" {
-			return u.addComponent(p)
-		}
-		if filepath.Ext(p) != ".gohtml" {
-			return nil
-		}
-		t, err := template.New(path.Base(p)).Funcs(funcs).ParseFS(FS, p)
-		if err != nil {
-			return err
-		}
-		if t == nil {
-			return nil // no templates in the file
-		}
-		for _, child := range t.Templates() {
-			name := child.Name()
-			if name == path.Base(p) || child.Tree == nil {
-				continue // don't add file template or empty templates
-			}
-			if other, ok := u.templates[name]; ok {
-				return fmt.Errorf("ui: template %q defined in both %s and %s", name, other, p)
-			}
-			u.templates[name] = struct{}{}
-			if _, err := root.AddParseTree(name, child.Tree); err != nil {
-				return err
-			}
-		}
-		return nil
+		_, err = t.New(p).Parse(string(body))
+		return err
 	})
 	if err != nil {
-		return nil, err
+		panic("ui: " + err.Error())
 	}
-	u.fragments, err = root.Clone()
-	if err != nil {
-		return nil, err
+	return t
+}
+
+// Render executes the named template. A missing or broken template is a
+// programming error, so it answers 500 with the error text.
+func Render(w http.ResponseWriter, name string, data any) {
+	var buf bytes.Buffer
+	if err := templates.ExecuteTemplate(&buf, name, data); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
-	return u, nil
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+	_, _ = buf.WriteTo(w)
 }

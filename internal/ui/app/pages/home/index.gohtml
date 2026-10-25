@@ -1,18 +1,17 @@
 {{ define "home/index" }}
+{{ template "layouts/head" dict "Title" "gofs" }}
 <main>
 	<h1>gofs</h1>
 	<p>
-		A Go server rendering pages with <code>html/template</code>. Interactivity comes from small native web
-		components that ask the server for HTML fragments and swap them into the page. No framework, no bundler,
-		no runtime dependencies.
+		A Go server rendering pages with <code>html/template</code>. The header above is declarative shadow DOM:
+		the server renders the markup, the browser attaches it, and no JavaScript is involved.
 	</p>
 
 	<section class="card">
 		<h2>Examples</h2>
-		<p class="muted">Each example is one page, one handler file and one or two components. Read them in this order.</p>
 		<ul>
-			<li><a href="/contacts">Contacts</a> — <code>&lt;live-search&gt;</code>, <code>&lt;load-more&gt;</code>, <code>&lt;edit-inline&gt;</code>, <code>&lt;row-delete&gt;</code></li>
-			<li><a href="/contacts/new">New contact</a> — <code>&lt;validate-field&gt;</code>, a plain form post, and <code>&lt;app-toast&gt;</code></li>
+			<li><a href="/contacts">Contacts</a> — search, paging, and inline edit and delete with plain forms</li>
+			<li><a href="/contacts/new">New contact</a> — a plain form post with server-side validation</li>
 		</ul>
 	</section>
 
@@ -21,29 +20,32 @@
 		<ul>
 			<li><code>internal/server/routes.go</code> — every route in one place</li>
 			<li><code>internal/ui/app/pages/&lt;section&gt;/</code> — templates and their handlers, side by side</li>
-			<li><code>internal/ui/app/components/&lt;tag&gt;/element.js</code> — one folder per custom element</li>
-			<li><code>internal/ui/app/components/request.js</code> — the one helper components share</li>
+			<li><code>internal/ui/app/components/&lt;tag&gt;/</code> — shadow DOM markup; behavior, if any, is an inline module script in the same file</li>
+			<li><code>internal/ui/app/layouts.gohtml</code> — the document head and foot</li>
 			<li><code>internal/app/contact</code> — the backend package: domain rules and the store</li>
 		</ul>
 	</section>
 
 	<p>
-		A modal needs no component. The browser's <code>&lt;dialog&gt;</code> handles opening, closing, focus, the
-		Escape key and the backdrop. The <code>command</code> and <code>commandfor</code> button attributes open and
-		close it with no JavaScript; <code>app.js</code> provides the same behaviour for older browsers.
+		The contacts page renders each row with its edit form already in the markup. The list is a declarative
+		shadow DOM component; the module script in that file hides the forms until Edit is pressed. Without
+		JavaScript they stay visible and the forms still post normally.
+	</p>
+
+	<p>
+		Dialogs and popovers need no component either. The native <code>&lt;dialog&gt;</code> and the popover
+		attributes handle focus, the Escape key and the backdrop themselves.
 	</p>
 
 	<section class="card">
-		<button type="button" commandfor="example-dialog" command="show-modal">Open dialog</button>
+		<button type="button" popovertarget="example-popover">Open popover</button>
 	</section>
 
-	<dialog id="example-dialog">
+	<div id="example-popover" popover>
 		<h2>Hello</h2>
-		<p>This dialog is plain HTML. A form with <code>method="dialog"</code> closes it without a request.</p>
-		<form method="dialog" class="actions">
-			<button type="button" commandfor="example-dialog" command="close">Cancel</button>
-			<button class="primary" value="ok">OK</button>
-		</form>
-	</dialog>
+		<p>A native popover: light dismiss, Escape and focus are handled by the browser.</p>
+		<button type="button" popovertarget="example-popover" popovertargetaction="hide">Close</button>
+	</div>
 </main>
+{{ template "layouts/foot" . }}
 {{ end }}
