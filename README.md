@@ -26,7 +26,7 @@ The template ships a small contacts app so that every pattern has a working exam
 
 | Page            | Shows                                                                                  |
 | --------------- | -------------------------------------------------------------------------------------- |
-| `/contacts`     | a GET search form, a "Load more" link, inline edit rows (toggled by a small script in the component) and delete as a plain form post |
+| `/contacts`     | search as you type (with a plain GET fallback), a "Load more" link, inline edit rows (toggled by a small script in the component) and delete as a plain form post |
 | `/contacts/new` | a plain form post with server-rendered validation errors                               |
 
 Every control is a working link or form before JavaScript loads: the edit forms are rendered into the page and stay visible without JS, and every state change is a plain form post followed by a redirect.

@@ -15,6 +15,14 @@ func Index(store *contact.Store) http.Handler {
 	})
 }
 
+// Results renders the search results on their own, for the live search in
+// <contacts-view>.
+func Results(store *contact.Store) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		ui.Render(w, "components/contacts-results", newIndexData(r, store))
+	})
+}
+
 func New() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ui.Render(w, "contacts/new", newData{Errors: map[string]string{}})

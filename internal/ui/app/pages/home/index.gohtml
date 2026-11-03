@@ -27,9 +27,9 @@
 	</section>
 
 	<p>
-		The contacts page renders each row with its edit form already in the markup. The list is a declarative
-		shadow DOM component; the module script in that file hides the forms until Edit is pressed. Without
-		JavaScript they stay visible and the forms still post normally.
+		The contacts page is a declarative shadow DOM component holding the search and the table. Its module
+		script debounces keystrokes and swaps in server-rendered results, then folds the edit forms until Edit
+		is pressed. Without JavaScript the search form reloads the page and the forms stay visible.
 	</p>
 
 	<p>

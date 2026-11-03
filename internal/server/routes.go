@@ -22,6 +22,7 @@ func (s *Server) Routes() {
 	routesMux.Handle("GET /", notfound.Index())
 
 	routesMux.Handle("GET /contacts", contacts.Index(s.contacts))
+	routesMux.Handle("GET /contacts/results", contacts.Results(s.contacts))
 	routesMux.Handle("GET /contacts/new", contacts.New())
 	routesMux.Handle("POST /contacts", contacts.Create(s.contacts))
 	routesMux.Handle("POST /contacts/{id}", contacts.Update(s.contacts))

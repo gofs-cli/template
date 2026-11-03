@@ -5,7 +5,7 @@ Guidance for AI agents working in this repository: the project template copied b
 ## Hard constraints
 
 - Runtime dependencies are only the Go standard library, `github.com/go-chi/chi/v5` (middleware only, never its router) and `github.com/go-chi/cors`; neither has transitive dependencies. A Postgres driver (`github.com/jackc/pgx/v5`) is the one addition an app may make. Do not add others.
-- No Node.js, npm, bundlers or JavaScript libraries. Never add `package.json`. The only client JavaScript is a small inline `<script type="module">` in the `contact-list` component template; everything else is server-rendered.
+- No Node.js, npm, bundlers or JavaScript libraries. Never add `package.json`. The only client JavaScript is a small inline `<script type="module">` in the `contacts-view` component template; everything else is server-rendered.
 - Templates are `html/template` files with the `.gohtml` suffix (not `.tmpl`), embedded via `//go:embed app` in `internal/ui/ui.go`; `make run` watches them and rebuilds.
 - Handlers hold no business logic; that belongs in `internal/app/<package>`.
 - Pages are rendered whole. There is no fragment/fetch layer and no client-side rendering: forms post, handlers redirect or re-render, links navigate.
@@ -58,12 +58,14 @@ Use a component when a region owns its markup, styles or behavior and can be rea
 - The file holds the host and a `<template shadowrootmode="open">` with the markup and a `<style>`. The browser attaches the shadow root while parsing, so the markup renders with no JavaScript.
 - Behavior, when needed, is an inline `<script type="module">` after the host in the same file. Scripts inside the shadow template are inert (the parser builds the template contents without a browsing context); the module script runs with the page and defines the custom element. Guard with `customElements.get(...)` in case the component is included twice.
 - Include it with `{{ template "components/<tag>" . }}` (pass `dict` for parameters, like `layouts/head`).
-- Styles are scoped to the shadow root and inherit custom properties (`--space-*`, `--color-*`). Host-level layout (e.g. `contact-list { display: block }`) goes in `app.css`; everything else about the component belongs in its `<style>`, not the global stylesheet.
+- Styles are scoped to the shadow root and inherit custom properties (`--space-*`, `--color-*`). Host-level layout (e.g. `contacts-view { display: block }`) goes in `app.css`; everything else about the component belongs in its `<style>`, not the global stylesheet.
 - The pattern in one sentence: server-rendered markup and CSS in a declarative shadow root, optional behavior in a colocated module script, one file per component.
 
-### Inline edit rows
+### Inline edit rows and live search
 
-- The `components/contact-list` component renders the search form, the count, the table and the "Load more" link. Each contact is two `<tr>`s: a display row with an Edit button and a delete form, and a `.row-edit` row with the edit form. The form's `action` (`/contacts/{id}`) and the hidden `q`/`page` fields are set server-side at render time.
+- The `components/contacts-view` component renders the search form, the count, the table and the "Load more" link. Each contact is two `<tr>`s: a display row with an Edit button and a delete form, and a `.row-edit` row with the edit form. The form's `action` (`/contacts/{id}`) and the hidden `q`/`page` fields are set server-side at render time.
+- Live search: the module script debounces `input` (200ms), fetches `GET /contacts/results?q=...` (which renders only `components/contacts-results`), replaces `#results` innerHTML, re-folds the edit rows, aborts a superseded request and syncs the URL with `history.replaceState`. The input lives outside `#results`, so focus is kept. Without JavaScript, the form GETs `/contacts` and the page reloads.
+- Keep search and results in one component. A separate search component cannot swap in a server fragment containing another declarative shadow root: `innerHTML`/fragment parsing does not attach declarative shadow roots, and a nested DSD template is inert. The parent owns both and updates only plain markup inside its existing shadow root.
 - The inline module in the component hides `.row-edit` rows on load unless the server marked them `data-open`, and toggles them with `[data-edit]` / `[data-cancel]` buttons inside its shadow root. Validation errors re-render the list with the row marked `data-open` and the submitted values.
 - Delete is a plain `POST /contacts/{id}/delete` form; search is a plain GET form; paging is a link. Nothing needs JavaScript.
 
