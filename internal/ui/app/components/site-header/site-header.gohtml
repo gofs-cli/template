@@ -1,0 +1,41 @@
+{{/*
+components/site-header: the site navigation, as declarative shadow DOM.
+
+The server renders the template; the browser attaches it to <site-header>
+without any JavaScript. Styles inside the shadow root are scoped to the
+header and can still use the app's custom properties.
+*/}}
+{{ define "components/site-header" }}
+<site-header>
+	<template shadowrootmode="open">
+		<style>
+			nav {
+				max-width: 60rem;
+				margin-inline: auto;
+				padding: var(--space-3) var(--space-4);
+				display: flex;
+				gap: var(--space-4);
+				flex-wrap: wrap;
+				align-items: center;
+			}
+			a {
+				text-decoration: none;
+				color: var(--color-text-muted);
+			}
+			a:hover {
+				color: var(--color-text);
+			}
+			.brand {
+				font-weight: 700;
+				color: var(--color-primary);
+				margin-inline-end: var(--space-4);
+			}
+		</style>
+		<nav aria-label="Main">
+			<a class="brand" href="/">gofs</a>
+			<a href="/contacts">Contacts</a>
+			<a href="/contacts/new">New contact</a>
+		</nav>
+	</template>
+</site-header>
+{{ end }}

@@ -1,4 +1,15 @@
+// Package db opens the database, runs migrations and wraps transactions.
+//
+// No driver is included because not every app needs a database. To use
+// Postgres: `go get github.com/jackc/pgx/v5`, then add the blank import
+// below and set DSN in .env.
+//
+//	_ "github.com/jackc/pgx/v5/stdlib"
+//
+// Queries are written in SQL and turned into Go by sqlc; see sqlc.yaml.
 package db
+
+//go:generate go run github.com/sqlc-dev/sqlc/cmd/sqlc@v1.30.0 generate
 
 import (
 	"context"

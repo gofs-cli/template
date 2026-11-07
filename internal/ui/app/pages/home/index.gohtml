@@ -1,0 +1,51 @@
+{{ define "home/index" }}
+{{ template "layouts/head" dict "Title" "gofs" }}
+<main>
+	<h1>gofs</h1>
+	<p>
+		A Go server rendering pages with <code>html/template</code>. The header above is declarative shadow DOM:
+		the server renders the markup, the browser attaches it, and no JavaScript is involved.
+	</p>
+
+	<section class="card">
+		<h2>Examples</h2>
+		<ul>
+			<li><a href="/contacts">Contacts</a> — search, paging, and inline edit and delete with plain forms</li>
+			<li><a href="/contacts/new">New contact</a> — a plain form post with server-side validation</li>
+		</ul>
+	</section>
+
+	<section class="card">
+		<h2>How it fits together</h2>
+		<ul>
+			<li><code>internal/server/routes.go</code> — every route in one place</li>
+			<li><code>internal/ui/app/pages/&lt;section&gt;/</code> — templates and their handlers, side by side</li>
+			<li><code>internal/ui/app/components/&lt;tag&gt;/</code> — shadow DOM markup; behavior, if any, is an inline module script in the same file</li>
+			<li><code>internal/ui/app/layouts.gohtml</code> — the document head and foot</li>
+			<li><code>internal/app/contact</code> — the backend package: domain rules and the store</li>
+		</ul>
+	</section>
+
+	<p>
+		The contacts page is a declarative shadow DOM component holding the search and the table. Its module
+		script debounces keystrokes and swaps in server-rendered results, then folds the edit forms until Edit
+		is pressed. Without JavaScript the search form reloads the page and the forms stay visible.
+	</p>
+
+	<p>
+		Dialogs and popovers need no component either. The native <code>&lt;dialog&gt;</code> and the popover
+		attributes handle focus, the Escape key and the backdrop themselves.
+	</p>
+
+	<section class="card">
+		<button type="button" popovertarget="example-popover">Open popover</button>
+	</section>
+
+	<div id="example-popover" popover>
+		<h2>Hello</h2>
+		<p>A native popover: light dismiss, Escape and focus are handled by the browser.</p>
+		<button type="button" popovertarget="example-popover" popovertargetaction="hide">Close</button>
+	</div>
+</main>
+{{ template "layouts/foot" . }}
+{{ end }}

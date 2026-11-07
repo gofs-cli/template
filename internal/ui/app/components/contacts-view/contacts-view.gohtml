@@ -1,0 +1,239 @@
+{{/*
+components/contacts-view: the search and the contacts table, as declarative
+shadow DOM.
+
+The server renders the search form and the first results into the shadow root;
+the browser attaches it without JavaScript and the form still submits normally.
+With JavaScript, the module script below the host debounces keystrokes, fetches
+the results fragment and replaces #results, leaving the input (and its focus)
+alone. Scripts inside a declarative shadow root are inert, so the module script
+lives next to the host in this same file.
+*/}}
+{{ define "components/contacts-view" }}
+<contacts-view>
+	<template shadowrootmode="open">
+		<style>
+			:host {
+				display: block;
+			}
+			table {
+				border-collapse: collapse;
+				width: 100%;
+			}
+			th,
+			td {
+				text-align: left;
+				padding: var(--space-2) var(--space-3);
+				border-block-end: 1px solid var(--color-border);
+			}
+			th {
+				color: var(--color-text-muted);
+				font-weight: 600;
+				font-size: 0.875rem;
+			}
+			a {
+				color: var(--color-primary);
+			}
+			.muted {
+				color: var(--color-text-muted);
+			}
+			.inactive {
+				color: var(--color-text-muted);
+				text-decoration: line-through;
+			}
+			.error {
+				color: var(--color-danger);
+				font-size: 0.875rem;
+			}
+			.actions {
+				display: flex;
+				gap: var(--space-2);
+				align-items: center;
+			}
+			.actions form {
+				margin: 0;
+			}
+			input,
+			button {
+				font: inherit;
+				color: inherit;
+			}
+			input {
+				padding: var(--space-2) var(--space-3);
+				border: 1px solid var(--color-border);
+				border-radius: var(--radius);
+				background: var(--color-surface-raised);
+				min-width: 0;
+			}
+			button {
+				padding: var(--space-2) var(--space-4);
+				border: 1px solid var(--color-border);
+				border-radius: var(--radius);
+				background: var(--color-surface-raised);
+				cursor: pointer;
+			}
+			button.primary {
+				background: var(--color-primary);
+				border-color: var(--color-primary);
+				color: var(--color-primary-contrast);
+			}
+			button.danger {
+				color: var(--color-danger);
+			}
+			.row-edit td {
+				background: var(--color-surface);
+			}
+			.row-edit form {
+				display: flex;
+				gap: var(--space-2);
+				flex-wrap: wrap;
+				align-items: center;
+			}
+			.row-edit input:not([type="hidden"]) {
+				flex: 1 1 8rem;
+			}
+			.row-edit .error {
+				flex-basis: 100%;
+			}
+			.visually-hidden {
+				position: absolute;
+				width: 1px;
+				height: 1px;
+				overflow: hidden;
+				clip-path: inset(50%);
+				white-space: nowrap;
+			}
+			.toolbar {
+				display: flex;
+				gap: var(--space-3);
+				align-items: center;
+				flex-wrap: wrap;
+			}
+			#results[aria-busy="true"] {
+				opacity: 0.6;
+			}
+		</style>
+
+		<form method="get" action="/contacts" class="toolbar" role="search">
+			<label for="q" class="visually-hidden">Search</label>
+			<input type="search" id="q" name="q" value="{{ .Query }}" placeholder="Search by name or email" autocomplete="off" />
+			<button>Search</button>
+		</form>
+
+		<div id="results">{{ template "components/contacts-results" . }}</div>
+	</template>
+</contacts-view>
+
+{{/* Behavior sits next to the host, not inside the shadow template: scripts
+inside a declarative shadow root are inert. */}}
+<script type="module">
+	class ContactsView extends HTMLElement {
+		#timer;
+		#ctrl;
+
+		connectedCallback() {
+			const root = this.shadowRoot;
+			const form = root?.querySelector("form");
+			const input = form?.querySelector('input[type="search"]');
+			const results = root?.getElementById("results");
+			if (!root || !(form instanceof HTMLFormElement) || !(input instanceof HTMLInputElement) || !results) return;
+
+			const foldEditRows = () => {
+				for (const row of root.querySelectorAll(".row-edit")) {
+					if (!row.hasAttribute("data-open")) row.hidden = true;
+				}
+			};
+			foldEditRows();
+
+			root.addEventListener("click", (e) => {
+				const button = e.target instanceof Element ? e.target.closest("[data-edit], [data-cancel]") : null;
+				if (!button) return;
+				const id = button.getAttribute("data-edit") ?? button.getAttribute("data-cancel");
+				if (!id) return;
+				const row = root.getElementById(`${id}-edit`);
+				if (!(row instanceof HTMLElement)) return;
+				row.hidden = button.hasAttribute("data-cancel");
+			});
+
+			const search = async () => {
+				this.#ctrl?.abort();
+				const ctrl = new AbortController();
+				this.#ctrl = ctrl;
+				results.setAttribute("aria-busy", "true");
+				const url = new URL("/contacts/results", location.href);
+				url.search = new URLSearchParams({ q: input.value }).toString();
+				try {
+					const res = await fetch(url, { signal: ctrl.signal });
+					if (!res.ok) throw new Error(res.statusText);
+					results.innerHTML = await res.text();
+					foldEditRows();
+					const q = input.value.trim();
+					history.replaceState(null, "", q ? `?${new URLSearchParams({ q })}` : location.pathname);
+				} catch (e) {
+					if (!(e instanceof DOMException && e.name === "AbortError")) console.error(e);
+				} finally {
+					if (this.#ctrl === ctrl) results.removeAttribute("aria-busy");
+				}
+			};
+
+			input.addEventListener("input", () => {
+				clearTimeout(this.#timer);
+				this.#timer = setTimeout(search, 200);
+			});
+			form.addEventListener("submit", (e) => {
+				e.preventDefault();
+				clearTimeout(this.#timer);
+				search();
+			});
+		}
+	}
+
+	if (!customElements.get("contacts-view")) customElements.define("contacts-view", ContactsView);
+</script>
+{{ end }}
+
+{{ define "components/contacts-results" }}
+<p class="muted">{{ .Page.Total }} {{ if eq .Page.Total 1 }}contact{{ else }}contacts{{ end }}</p>
+<table>
+	<thead>
+		<tr>
+			<th>Name</th>
+			<th>Email</th>
+			<th><span class="visually-hidden">Actions</span></th>
+		</tr>
+	</thead>
+	<tbody id="contact-rows">
+		{{ range .Rows }}{{ block "components/contact-row" . }}
+		<tr id="contact-{{ .Contact.ID }}" {{ if not .Contact.Active }}class="inactive"{{ end }}>
+			<td>{{ .Contact.Name }}</td>
+			<td>{{ .Contact.Email }}</td>
+			<td class="actions">
+				<button type="button" data-edit="contact-{{ .Contact.ID }}">Edit</button>
+				<form method="post" action="/contacts/{{ .Contact.ID }}/delete">
+					<button class="danger">Delete</button>
+				</form>
+			</td>
+		</tr>
+		{{/* The edit form is usable without JavaScript; the module script only hides
+		it until Edit is pressed. data-open keeps it visible after a validation error. */}}
+		<tr class="row-edit" id="contact-{{ .Contact.ID }}-edit" {{ if .Editing }}data-open{{ end }}>
+			<td colspan="3">
+				<form method="post" action="/contacts/{{ .Contact.ID }}" class="row-form">
+					<input type="hidden" name="q" value="{{ .Query }}" />
+					<input type="hidden" name="page" value="{{ .Page }}" />
+					<input name="first_name" value="{{ .Contact.FirstName }}" aria-label="First name" required />
+					<input name="last_name" value="{{ .Contact.LastName }}" aria-label="Last name" required />
+					<input name="email" type="email" value="{{ .Contact.Email }}" aria-label="Email" required />
+					<button class="primary">Save</button>
+					<button type="button" data-cancel="contact-{{ .Contact.ID }}">Cancel</button>
+					{{ with .Errors.first_name }}<p class="error">{{ . }}</p>{{ end }}
+					{{ with .Errors.last_name }}<p class="error">{{ . }}</p>{{ end }}
+					{{ with .Errors.email }}<p class="error">{{ . }}</p>{{ end }}
+				</form>
+			</td>
+		</tr>
+		{{ end }}{{ end }}
+	</tbody>
+</table>
+{{ with .MoreURL }}<a href="{{ . }}">Load more</a>{{ end }}
+{{ end }}
